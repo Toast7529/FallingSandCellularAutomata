@@ -6,8 +6,8 @@ ChunkWorker::~ChunkWorker() {};
 
 void ChunkWorker::updateChunk(bool oddUpdate) {
     //if (chunk->minY < chunk->maxY && chunk->minX < chunk->maxX)
-    for (int y = chunk->minY; y < chunk->maxY; y++) {
-        for (int x = chunk->minX; x < chunk->maxX; x++) {
+    for (int y = 0; y < chunk->mheight; y++) {
+        for (int x = 0; x < chunk->mwidth; x++) {
             int globalY = y + (chunk->mheight * chunk->my);
             int globalX = x + (chunk->mwidth * chunk->mx);
             if (Element* element = chunk->getElement(globalX, globalY)) {
