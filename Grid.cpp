@@ -119,21 +119,21 @@ void Grid::render(SDL_Renderer* renderer) const {
 
         //SDL_RenderDrawRect(renderer, &rect);
 
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for dirty rectangles
-        int minX = chunk->minX;
-        int maxX = chunk->maxX;
-        int minY = chunk->minY;
-        int maxY = chunk->maxY;
+        //SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for dirty rectangles
+        //int minX = chunk->minX;
+        //int maxX = chunk->maxX;
+        //int minY = chunk->minY;
+        //int maxY = chunk->maxY;
 
-        if (minX <= maxX && minY <= maxY) {
-            SDL_Rect dirtyRect;
-            dirtyRect.x = chunk->mx * chunk->mwidth + minX;
-            dirtyRect.y = chunk->my * chunk->mheight + minY;
-            dirtyRect.w = maxX - minX + 1;
-            dirtyRect.h = maxY - minY + 1;
+        //if (minX <= maxX && minY <= maxY) {
+        //    SDL_Rect dirtyRect;
+        //    dirtyRect.x = chunk->mx * chunk->mwidth + minX;
+        //    dirtyRect.y = chunk->my * chunk->mheight + minY;
+        //    dirtyRect.w = maxX - minX + 1;
+        //    dirtyRect.h = maxY - minY + 1;
 
-            SDL_RenderDrawRect(renderer, &dirtyRect);
-        }
+        //    SDL_RenderDrawRect(renderer, &dirtyRect);
+        //}
     }
 
     
