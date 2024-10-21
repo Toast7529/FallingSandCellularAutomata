@@ -1,5 +1,3 @@
-Here’s the updated README file that includes information about the chunk system based on the Winter.dev article:
-
 ---
 
 # Falling Sand Cellular Automata
