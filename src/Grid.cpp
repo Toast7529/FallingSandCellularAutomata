@@ -1,7 +1,8 @@
 #include "Grid.h"
+#include <cmath>
 #include "Element.h"
 #include "Chunk.h"
-#include "chunkWorker.h"
+#include "ChunkWorker.h"
 #include <vector>
 #include <iostream>
 #include <utility>
@@ -82,7 +83,7 @@ void Grid::update() {
     removeEmptyChunks();
 
     std::mutex mutex;
-    std::condition_variable cond;
+    //std::condition_variable cond;
     int chunkSize = chunks.size();
 
     for (int i = 0; i < chunkSize; i++) {
@@ -149,7 +150,7 @@ Chunk* Grid::getChunk(int x, int y) {
 
 std::pair<int,int> Grid::getChunkLocation(int x, int y) const {
     //std::cout << "Chunk pos: x: " << floor(float(x) / chunkWidth) << " Y: " << floor(float(y) / chunkHeight) << std::endl;
-    return { floor(float(x) / chunkWidth), floor(float(y) / chunkHeight) };
+    return {std::floor(float(x) / chunkWidth), floor(float(y) / chunkHeight) };
 }
 
 Chunk* Grid::getChunkDirect(std::pair<int, int> location) const {

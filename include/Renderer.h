@@ -1,6 +1,7 @@
 #pragma once
-#include <SDL.h>
-#include "grid.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_render.h>
+#include "Grid.h"
 class Renderer
 {
 public:

@@ -1,4 +1,4 @@
-#include "sand.h"
+#include "Sand.h"
 #include <SDL.h>
 #include "ChunkWorker.h"
 #include <random>

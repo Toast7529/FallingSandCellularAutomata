@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 Renderer::Renderer(int width, int height) {
 	SDL_Init(SDL_INIT_VIDEO);

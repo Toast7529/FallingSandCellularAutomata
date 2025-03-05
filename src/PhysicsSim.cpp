@@ -1,7 +1,7 @@
-#include "renderer.h"
-#include "grid.h"
+#include "Renderer.h"
+#include "Grid.h"
 #include "Concrete.h"
-#include "water.h"
+#include "Water.h"
 #include "ToolHandler.h"
 #include <iostream>
 

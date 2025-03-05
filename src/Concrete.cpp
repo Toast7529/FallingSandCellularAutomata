@@ -11,5 +11,5 @@ SDL_Color Concrete::getColor() const {
 }
 
 void Concrete::update(ChunkWorker& grid, int x, int y) {
-    std::srand(std::time(nullptr));
+    std::srand(time(nullptr));
 }
