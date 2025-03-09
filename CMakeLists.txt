@@ -3,10 +3,16 @@ project(FallingSandCellularAutomata)
 
 set(CMAKE_CXX_STANDARD 23)
 
+if (WIN32)
+    set(SDL2_DIR "${CMAKE_SOURCE_DIR}/SDL2/cmake")
+    set(SDL2_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/SDL2/include")
+    set(SDL2_LIBRARIES "${CMAKE_SOURCE_DIR}/SDL2/lib/X64/SDL2.lib")
+endif()
+
 find_package(SDL2 REQUIRED)
 
 # Include SDL2 and project header directories
-include_directories(FallingSandCellularAutomata ${SDL2_INLCUDE_DIRS})
+include_directories(FallingSandCellularAutomata ${SDL2_INCLUDE_DIR})
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 # Add source files
