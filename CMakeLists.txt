@@ -17,23 +17,23 @@ include_directories("${CMAKE_SOURCE_DIR}/include")
 
 # Add source files
 set(SOURCES
-        src/Chunk.cpp
-        src/ChunkWorker.cpp
-        src/Concrete.cpp
+        src/world/Chunk.cpp
+        src/world/ChunkWorker.cpp
+        src/materials/solid/Concrete.cpp
         src/Element.cpp
-        src/Fire.cpp
-        src/Gas.cpp
-        src/Grid.cpp
-        src/Liquid.cpp
-        src/PhysicsSim.cpp
-        src/Renderer.cpp
-        src/Sand.cpp
-        src/Smoke.cpp
-        src/Solid.cpp
-        src/Steam.cpp
-        src/ToolHandler.cpp
-        src/Water.cpp
-        src/Wood.cpp
+        src/materials/gas/Fire.cpp
+        src/materials/gas/Gas.cpp
+        src/world/Grid.cpp
+        src/materials/liquid/Liquid.cpp
+        src/FallingSand.cpp
+        src/utils/Renderer.cpp
+        src/materials/solid/Sand.cpp
+        src/materials/gas/Smoke.cpp
+        src/materials/solid/Solid.cpp
+        src/materials/gas/Steam.cpp
+        src/utils/ToolHandler.cpp
+        src/materials/liquid/Water.cpp
+        src/materials/solid/Wood.cpp
         # Add additional .cpp files here
 )
 
