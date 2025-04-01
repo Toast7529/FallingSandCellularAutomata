@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <algorithm>
+#include <mutex>
 
 Chunk::Chunk(int width, int height, int x, int y) : mwidth(width), mheight(height), mx(x), my(y) {
     //std::cout << "Chunk created at x:" << x << " Y: " << y << std::endl;
@@ -24,6 +25,7 @@ bool Chunk::isValidPosition(int x, int y) const {
 
 void Chunk::swapElements(int x0, int y0, int x1, int y1) {
     if (isValidPosition(x0, y0) && isValidPosition(x1, y1)) {
+        std::unique_lock lock(changesMutex);
         std::swap(chunk[getY(y0)][getX(x0)], chunk[getY(y1)][getX(x1)]);
         keepAlive(x0, y0);
         keepAlive(x1, y1);
@@ -52,7 +54,10 @@ void Chunk::clearChunk() {
 }
 
 void Chunk::setElement(int x, int y, std::unique_ptr<Element> element) {   
-    if (chunk[getY(y)][getX(x)] == nullptr && element != nullptr) totalElements++;
+    if (chunk[getY(y)][getX(x)] == nullptr && element != nullptr) {
+        std::unique_lock lock(filledCellCountMutex);
+        totalElements++;
+    }
     chunk[getY(y)][getX(x)] = std::move(element);
     keepAlive(x, y);
 }
@@ -63,6 +68,7 @@ std::unique_ptr<Element> Chunk::removeElement(int x, int y) {
     std::unique_ptr<Element> temp = std::move(chunk[getY(y)][getX(x)]);
     if (temp != nullptr) {
         chunk[getY(y)][getX(x)] = nullptr;
+        std::unique_lock lock(filledCellCountMutex);
         totalElements--;
     }
     keepAlive(x, y);
@@ -72,6 +78,7 @@ std::unique_ptr<Element> Chunk::removeElement(int x, int y) {
 void Chunk::keepAlive(int x, int y) {
     x = getX(x);
     y = getY(y);
+    std::unique_lock lock(workingRectMutex);
 
     minXw = std::clamp(std::min(x - 2, minXw), 0, mwidth);
     minYw = std::clamp(std::min(y - 2, minYw), 0, mheight);

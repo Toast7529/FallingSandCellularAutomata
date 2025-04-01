@@ -10,6 +10,7 @@ if (WIN32)
 endif()
 
 find_package(SDL2 REQUIRED)
+find_package(TBB CONFIG REQUIRED)
 
 # Include SDL2 and project header directories
 include_directories(FallingSandCellularAutomata ${SDL2_INCLUDE_DIR})
@@ -40,4 +41,4 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Link SDL2 libraries
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} TBB::tbb)

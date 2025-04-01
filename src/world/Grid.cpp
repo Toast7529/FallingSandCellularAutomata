@@ -12,7 +12,7 @@
 Grid::Grid(int width, int height) : width(width), height(height), chunkWidth(width/10), chunkHeight(height/10) {
     std::cout << "Chunk height: " << chunkHeight << std::endl;
     std::cout << "Chunk width: " << chunkWidth << std::endl;
-
+    Task = new ThreadPool(4);
     grid.resize(height);
     for (int i = 0; i < height; ++i) {
         grid[i].resize(width);
@@ -31,8 +31,8 @@ void Grid::swapElements(int x0, int y0, int x1, int y1) {
         Chunk* chunk1 = getChunk(x1, y1);
         chunk0->keepAlive(x0, y0);
         chunk1->keepAlive(x1, y1);
-
-
+        std::unique_lock lock(chunk0->changesMutex);
+        std::unique_lock lock1(chunk1->changesMutex);
         std::unique_ptr<Element> temp = std::move(chunk0->removeElement(x0, y0));
         chunk0->setElement(x0, y0, std::move(chunk1->removeElement(x1, y1)));
         chunk1->setElement(x1, y1, std::move(temp));
@@ -83,16 +83,37 @@ void Grid::update() {
     removeEmptyChunks();
 
     std::mutex mutex;
-    //std::condition_variable cond;
-    int chunkSize = chunks.size();
+    std::condition_variable cond;
 
-    for (int i = 0; i < chunkSize; i++) {
-        ChunkWorker(*this, chunks[i]).updateChunk(oddUpdate);
-    }
+    auto processAllChunks = [&](std::function<void(Chunk*)> func) {
+        int chunkCount = chunks.size();
 
-    for (Chunk* chunk : chunks) {
+        for (Chunk* chunk : chunks) {
+            Task->enqueue([&, chunk]() {
+                func(chunk);
+                { std::unique_lock lock(mutex); chunkCount--; }
+                cond.notify_one();
+            });
+        }
+        std::unique_lock lock(mutex);
+        cond.wait(lock, [&]() {return chunkCount == 0;});
+    };
+    // Update chunks
+    processAllChunks([&](Chunk* chunk) {
+        ChunkWorker(*this, chunk).updateChunk(oddUpdate);
+    });
+    // Update dirty rectangles
+    processAllChunks([&](Chunk* chunk) {
         chunk->UpdateRect();
-    }
+    });
+
+    // for (int i = 0; i < chunkSize; i++) {
+    //     ChunkWorker(*this, chunks[i]).updateChunk(oddUpdate);
+    // }
+    //
+    // for (Chunk* chunk : chunks) {
+    //     chunk->UpdateRect();
+    // }
     oddUpdate = !oddUpdate;
 }
 
@@ -112,13 +133,13 @@ void Grid::render(SDL_Renderer* renderer) const {
         //SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red color
 
         //// Outline chunk
-        //SDL_Rect rect;
-        //rect.x = chunk->mx * chunk->mwidth;
-        //rect.y = chunk->my * chunk->mheight;
-        //rect.w = chunk->mwidth;
-        //rect.h = chunk->mheight;
+        SDL_Rect rect;
+        rect.x = chunk->mx * chunk->mwidth;
+        rect.y = chunk->my * chunk->mheight;
+        rect.w = chunk->mwidth;
+        rect.h = chunk->mheight;
 
-        //SDL_RenderDrawRect(renderer, &rect);
+        SDL_RenderDrawRect(renderer, &rect);
 
         //SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for dirty rectangles
         //int minX = chunk->minX;
@@ -154,8 +175,12 @@ std::pair<int,int> Grid::getChunkLocation(int x, int y) const {
 }
 
 Chunk* Grid::getChunkDirect(std::pair<int, int> location) const {
-    auto itr = chunkLookup.find(location);
-    return  itr != chunkLookup.end() ? itr->second : nullptr;
+    tbb::concurrent_hash_map<std::pair<int, int>, Chunk*, pair_hash>::const_accessor accessor;
+
+    if (chunkLookup.find(accessor, location)) {
+        return accessor->second;
+    }
+    return nullptr;
 }
 
 Chunk* Grid::createChunk(std::pair<int, int> location) {
@@ -164,7 +189,10 @@ Chunk* Grid::createChunk(std::pair<int, int> location) {
     
     Chunk* chunk = new Chunk(chunkWidth, chunkHeight, x, y);
     chunkLookup.insert({ location, chunk });
-    chunks.push_back(chunk);
+    {
+        std::unique_lock lock(chunkMutex);
+        chunks.push_back(chunk);
+    }
     return chunk;
 }
 

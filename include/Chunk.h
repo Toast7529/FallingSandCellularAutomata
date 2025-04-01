@@ -33,9 +33,16 @@ public:
     int minX, minY, maxX, maxY; // dirt rectangle
     void keepAlive(int x, int y);
     void UpdateRect();
+
+    // Threading:
+    std::mutex filledCellCountMutex;
+    std::mutex changesMutex;
+    std::mutex workingRectMutex;
 private:
     int minXw, minYw, maxXw, maxYw; // working dirt rectangle
     std::vector<std::vector<std::unique_ptr<Element>>> chunk;
+
+
 };
 
 

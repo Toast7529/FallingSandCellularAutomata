@@ -6,11 +6,16 @@
 #include <memory>
 #include <utility>
 #include <unordered_map>
+#include "tbb/concurrent_hash_map.h"
+#include "ThreadPool.h"
 struct pair_hash {
-    template<typename T1, typename T2>
-    size_t operator() (const std::pair<T1, T2>& pair) const {
-        return (std::hash<T1>()(pair.first) * 0x1f1f1f1f)
-            ^ std::hash<T2>()(pair.second);
+    size_t hash(const std::pair<int, int>& key) const {
+        return (std::hash<int>()(key.first) * 0x1f1f1f1f)
+            ^ std::hash<int>()(key.second);
+    }
+
+    bool equal(const std::pair<int,int>& a, const std::pair<int,int>& b) const {
+        return a.first == b.first && a.second == b.second;
     }
 };
 
@@ -43,7 +48,12 @@ private:
 
     // Store chunks
     std::vector<Chunk*> chunks;
-    std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> chunkLookup;
+    //std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> chunkLookup;
+
+    ThreadPool* Task = nullptr;
+    std::mutex chunkMutex;
+    tbb::concurrent_hash_map<std::pair<int, int>, Chunk*, pair_hash> chunkLookup;
+
 };
 
 
